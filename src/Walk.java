@@ -4,9 +4,8 @@
 5, 3, A, 4
 3, 5, B, 2
 6, 7, R, 5
-4, 7, L, 6
+5, 1, L, 6
 */
-import java.util.Arrays;
 import java.util.Scanner;
 
 //Isaiah Cruz
@@ -25,13 +24,11 @@ public void init()
         
     String[] input = new String[6];
     String[] output = new String[5];
-    
     Scanner s = new Scanner(System.in);
     System.out.println("INPUT:\n");
     for(int k = 0; k < input.length; k++)
         {System.out.print((k + 1) + ". ");
         input[k] = s.nextLine();
-        System.out.println();
         }
     
     setupArray(parseString(input[0]));
@@ -39,6 +36,31 @@ public void init()
     for(int k = 1; k < 6; k++)
         {output[k - 1] = parseInput(parseString(input[k]));
         }
+    
+    System.out.println("\n\nOUTPUT:\n");
+    for(int k = 0; k < output.length; k++)
+        {System.out.print((k + 1) + ". " + output[k] + "\n");
+        }
+    }
+
+public void visualizeArray(int row, int col, int newRow, int newCol, int oldRow, int oldCol)
+    {System.out.println();
+    
+    for(int k = 7; k >= 0; k--)
+        {System.out.println();
+        for(int j = 0; j < array[k].length; j++)
+            {if(k == row && j == col)
+                System.out.print("C ");
+            else if(k == newRow && j == newCol)
+                System.out.print("N ");
+            else if(k == oldRow && j == oldCol)
+                System.out.print("O ");
+            else
+                System.out.print(array[k][j] + " ");
+            }
+        }
+    
+    System.out.println();
     }
 
 public String hexToOctal(String hex)
@@ -63,7 +85,7 @@ public void setupArray(String str)
     
     int i = 0;
     while(s.hasNext())
-        {row[i] = s.next();
+        {row[i] = hexToOctal(s.next());
         i++;
         }
     
@@ -76,8 +98,8 @@ public void setupArray(String str)
 
 public String parseInput(String str)
     {Scanner s = new Scanner(str);
-    int row = s.nextInt();
-    int col = s.nextInt();
+    int row = s.nextInt() - 1;
+    int col = s.nextInt() - 1;
     
     String dirStr = s.next();
 
@@ -87,28 +109,28 @@ public String parseInput(String str)
     int iterationNum = 0;
     
     switch(dirStr)
-        {case "L":
+        {case "R":
             {oldRow = row;
             oldCol = col + 1;
             if(oldCol > 7)
                 oldCol = 0;
             break;
             }
-        case "R":
+        case "L":
             {oldRow = row;
             oldCol = col - 1;
             if(oldCol < 0)
                 oldCol = 7;
             break;
             }
-        case "A":
+        case "B":
             {oldRow = row - 1;
             oldCol = col;
             if(oldRow < 0)
                 oldRow = 7;
             break;
             }
-        case "B":
+        case "A":
             {oldRow = row + 1;
             oldCol = col;
             if(oldRow > 7)
@@ -120,7 +142,7 @@ public String parseInput(String str)
     iterationNum = s.nextInt();
     
     int[] result = followOrders(row, col, oldRow, oldCol, iterationNum);
-    return result[0] + ", " + result[1];
+    return (result[0] + 1) + ", " + (result[1] + 1);
     }
 
 public int findDir(int row, int col, int oldRow, int oldCol)
@@ -132,14 +154,14 @@ public int findDir(int row, int col, int oldRow, int oldCol)
     boolean E = false;
     boolean W = false;
     
-    if(rowDiff == 1)
+    if(colDiff == 1 || colDiff == -7)
         E = true;
-    else if(rowDiff == -1)
+    else if(colDiff == -1 || colDiff == 7)
         W = true;
     
-    if(colDiff == 1)
+    if(rowDiff == 1 || rowDiff == -7)
         N = true;
-    else if(colDiff == -1)
+    else if(rowDiff == -1 || rowDiff == 7)
         S = true;
     
     if(E)
@@ -174,7 +196,9 @@ public int[] followOrders(int row, int col, int oldRow, int oldCol, int iteratio
     int newCol = 0;
     
     int arrayVal = array[row][col];
-    dir = Math.abs((dir - arrayVal) % 8);
+    dir -= arrayVal;
+    if(dir < 0)
+        dir += 8;
     
     switch(dir)
         {case 0:
@@ -255,7 +279,9 @@ public int[] followOrders(int row, int col, int oldRow, int oldCol, int iteratio
             }
         }
     
-    return followOrders(newRow, newCol, row, col, iterationNum--);
+    visualizeArray(row, col, newRow, newCol, oldRow, oldCol);
+    
+    return followOrders(newRow, newCol, row, col, iterationNum - 1);
     }
 
 public static void main(String[] args)
