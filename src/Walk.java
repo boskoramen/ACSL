@@ -81,6 +81,13 @@ public String followOrders(String str)
     pos[0] = s.nextInt();
     pos[1] = s.nextInt();
     
+    String dirStr = s.next();
+    int dir = 0;
+    switch(dirStr)
+        {case "L":
+            {dir
+            }
+        }
     }
 
 public static void main(String[] args)
