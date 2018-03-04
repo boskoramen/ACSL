@@ -37,7 +37,7 @@ public void init()
     setupArray(parseString(input[0]));
     
     for(int k = 1; k < 6; k++)
-        {output[k - 1] = followOrders(parseString(input[k]));
+        {output[k - 1] = parseInput(parseString(input[k]));
         }
     }
 
@@ -74,20 +74,188 @@ public void setupArray(String str)
         }
     }
 
-public String followOrders(String str)
-    {int[] pos = new int[2];
-    
-    Scanner s = new Scanner(str);
-    pos[0] = s.nextInt();
-    pos[1] = s.nextInt();
+public String parseInput(String str)
+    {Scanner s = new Scanner(str);
+    int row = s.nextInt();
+    int col = s.nextInt();
     
     String dirStr = s.next();
-    int dir = 0;
+
+    int oldRow = 0;
+    int oldCol = 0;
+    
+    int iterationNum = 0;
+    
     switch(dirStr)
         {case "L":
-            {dir
+            {oldRow = row;
+            oldCol = col + 1;
+            if(oldCol > 7)
+                oldCol = 0;
+            break;
+            }
+        case "R":
+            {oldRow = row;
+            oldCol = col - 1;
+            if(oldCol < 0)
+                oldCol = 7;
+            break;
+            }
+        case "A":
+            {oldRow = row - 1;
+            oldCol = col;
+            if(oldRow < 0)
+                oldRow = 7;
+            break;
+            }
+        case "B":
+            {oldRow = row + 1;
+            oldCol = col;
+            if(oldRow > 7)
+                oldRow = 0;
+            break;
             }
         }
+    
+    iterationNum = s.nextInt();
+    
+    int[] result = followOrders(row, col, oldRow, oldCol, iterationNum);
+    return result[0] + ", " + result[1];
+    }
+
+public int findDir(int row, int col, int oldRow, int oldCol)
+    {int rowDiff = oldRow - row;
+    int colDiff = oldCol - col;
+    
+    boolean N = false;
+    boolean S = false;
+    boolean E = false;
+    boolean W = false;
+    
+    if(rowDiff == 1)
+        E = true;
+    else if(rowDiff == -1)
+        W = true;
+    
+    if(colDiff == 1)
+        N = true;
+    else if(colDiff == -1)
+        S = true;
+    
+    if(E)
+        {if(N)
+            return 1;
+        else if(S)
+            return 7;
+        else
+            return 0;
+        }
+    else if(W)
+        {if(N)
+            return 3;
+        if(S)
+            return 5;
+        else 
+            return 4;
+        }
+    else
+        {if(N)
+            return 2;
+        else
+            return 6;
+        }
+    }
+
+public int[] followOrders(int row, int col, int oldRow, int oldCol, int iterationNum)
+    {if(iterationNum == 0)
+        return new int[]{row, col};
+    int dir = findDir(row, col, oldRow, oldCol);
+    int newRow = 0;
+    int newCol = 0;
+    
+    int arrayVal = array[row][col];
+    dir = Math.abs((dir - arrayVal) % 8);
+    
+    switch(dir)
+        {case 0:
+            {newRow = row;
+            newCol = col + 1;
+            if(newCol > 7)
+                {newCol = 0;
+                }
+            break;
+            }
+        case 1:
+            {newRow = row + 1;
+            if(newRow > 7)
+                {newRow = 0;
+                }
+            newCol = col + 1;
+            if(newCol > 7)
+                {newCol = 0;
+                }
+            break;
+            }
+        case 2:
+            {newRow = row + 1;
+            if(newRow > 7)
+                {newRow = 0;
+                }
+            newCol = col;
+            break;
+            }
+        case 3:
+            {newRow = row + 1;
+            if(newRow > 7)
+                {newRow = 0;
+                }
+            newCol = col - 1;
+            if(newCol < 0)
+                {newCol = 7;
+                }
+            break;
+            }
+        case 4:
+            {newRow = row;
+            newCol = col - 1;
+            if(newCol < 0)
+                {newCol = 7;
+                }
+            break;
+            }
+        case 5:
+            {newRow = row - 1;
+            if(newRow < 0)
+                {newRow = 7;
+                }
+            newCol = col - 1;
+            if(newCol < 0)
+                {newCol = 7;
+                }
+            break;
+            }
+        case 6:
+            {newRow = row - 1;
+            if(newRow < 0)
+                {newRow = 7;
+                }
+            newCol = col;
+            break;
+            }
+        case 7:
+            {newRow = row - 1;
+            if(newRow < 0)
+                {newRow = 7;
+                }
+            newCol = col + 1;
+            if(newCol > 7)
+                {newCol = 0;
+                }
+            break;
+            }
+        }
+    
+    return followOrders(newRow, newCol, row, col, iterationNum--);
     }
 
 public static void main(String[] args)
